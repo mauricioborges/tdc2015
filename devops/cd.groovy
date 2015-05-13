@@ -1,24 +1,32 @@
+stage name: 'Build and Unit Tests'
+
 node {
-  echo "### VERSION CONTROL"
   git url: "https://github.com/mauricioborges/cuke-gradle-demo.git"
-  echo "### BUILD AND UNIT TESTS"
   try {
-     sh "./gradlew test"
+     sh "./gradlew clean test"
   } finally {
      step([$class: 'JUnitResultArchiver', testResults: '**/build/test-results/TEST-*.xml'])
   }
 }
-echo "### AUTOMATED ACCEPTANCE TESTS"
-def automatedAcceptanceTests = [:]
+
+stage name: 'Automated Acceptance Tests', concurrency: 3 //avoid overloading
+/*def automatedAcceptanceTests = [:]
 
 automatedAcceptanceTests[functional]=node {
+  git url: "https://github.com/mauricioborges/cuke-gradle-demo.git"
   sh "./gradlew cucumber_functional"
 }
 automatedAcceptanceTests[ui]=node {
+  git url: "https://github.com/mauricioborges/cuke-gradle-demo.git"
   sh "./gradlew cucumber_UI"
 }
 parallel automatedAcceptanceTests
-echo "### USER ACCEPTANCE TESTS"
+*/
+stage name: 'User Acceptance Tests'
 input "are all of your tests ok?"
-echo "### RELEASE!!!"
+
+stage name: 'Production', concurrency: 1
 input "can I release everything?"
+echo 'Imagine that I\'m running very complex deploying processes here!'
+sleep 45
+echo "it's over, your version is running...go home"
