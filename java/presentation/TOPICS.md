@@ -44,6 +44,11 @@ Michael Feathers dá altas ideias:
 * Mock w/o external fmwks
 * Spock == DSL
 * assertions muito massa! (expressividade)
+* Traits
+* metaClasses
+
+## Conclusão
+
 
 
 ## Fontes
