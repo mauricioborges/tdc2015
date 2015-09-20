@@ -35,6 +35,7 @@ public class Produto {
         produtoTexto.append("id: " + id);
         produtoTexto.append(" apelido: " + apelido);
         produtoTexto.append(" preço: " + preco);
+        produtoTexto.append(" EAN: " + ean);
         return produtoTexto.toString();
 
     }

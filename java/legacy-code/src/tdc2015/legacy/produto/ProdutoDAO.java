@@ -75,7 +75,18 @@ public class ProdutoDAO {
     }
 
     public List<Produto> list() {
-        String query = "SELECT * FROM PRODUTOS";
+        return getListaProdutosFromQuery("SELECT * FROM PRODUTOS");
+    }
+
+    public List<Produto> buscaPorEAN(String ean) {
+        return getListaProdutosFromQuery("SELECT * FROM PRODUTOS WHERE ean like '" + ean + "' COLLATE NOCASE");
+    }
+
+    public List<Produto> buscaPorNome(String ean) {
+        return getListaProdutosFromQuery("SELECT * FROM PRODUTOS WHERE nome like '" + ean + "' COLLATE NOCASE");
+    }
+
+    private List<Produto> getListaProdutosFromQuery(String query) {
         ResultSet rs = null;
         List<Produto> produtos = new ArrayList<Produto>();
         try {
@@ -99,6 +110,8 @@ public class ProdutoDAO {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return null;
+        return new ArrayList<Produto>();
     }
+
+
 }

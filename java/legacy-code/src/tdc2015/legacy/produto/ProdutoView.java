@@ -50,8 +50,14 @@ public class ProdutoView {
     }
 
     private void criar() {
-        Produto produto = controller.criar(criarDialog());
-        console.printf(produto.toString());
+        Produto produto = null;
+        try {
+            produto = controller.criar(criarDialog());
+            console.printf(produto.toString());
+        } catch (ProdutoException e) {
+            console.printf(e.getMessage()+",produto não criado\n");
+        }
+
     }
 
     private void alterar() {

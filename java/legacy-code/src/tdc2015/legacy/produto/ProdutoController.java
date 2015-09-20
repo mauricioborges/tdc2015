@@ -2,9 +2,6 @@ package tdc2015.legacy.produto;
 
 import java.util.List;
 
-/**
- * Created by mauricio on 18/09/15.
- */
 public class ProdutoController {
 
     private ProdutoDAO dao = new ProdutoDAO(Env.CONNECTION_DATA);
@@ -13,8 +10,23 @@ public class ProdutoController {
         return dao.list();
     }
 
-    public Produto criar(String dadosProduto) {
-        Integer codigo = dao.createProduct(dadosProduto);
+    private String pegaEAN(String dadosProduto) {
+        return dadosProduto.split(";")[4];
+    }
+
+    private String pegaNome(String dadosProduto) {
+        return dadosProduto.split(";")[0];
+    }
+
+    public Produto criar(String dadosProduto) throws ProdutoException {
+        if (dao.buscaPorEAN(pegaEAN(dadosProduto)).size() > 0) {
+            throw new ProdutoException("EAN duplicado!");
+        }
+        if (dao.buscaPorNome(pegaNome(dadosProduto)).size() > 0) {
+            throw new ProdutoException("Nome duplicado!");
+        }
+        Integer codigo = null;
+        codigo = dao.createProduct(dadosProduto);
 
         return dao.getProduct(codigo);
     }
