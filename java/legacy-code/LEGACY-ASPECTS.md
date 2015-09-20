@@ -25,3 +25,8 @@ java -jar legacy-code.jar
 1 <ENTER>
 
 Produtos: 1-lista, 2-cria, 3-altera, 4-remove, 0-volta
+
+==
+SQLs
+"create table produtos (id integer primary key autoincrement, nome text,descricao text,preco real, marca text, ean text, apelido text, unidademedida text);"
+
