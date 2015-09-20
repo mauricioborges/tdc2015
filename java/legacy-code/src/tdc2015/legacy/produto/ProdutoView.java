@@ -43,14 +43,15 @@ public class ProdutoView {
     private void listar() {
         List<Produto> produtos = controller.listar();
         for (int i = 0; i < produtos.size(); i++) {
-            console.printf("produto " + produtos.get(i).toString()+"\n");
+            console.printf("produto " + produtos.get(i).toString() + "\n");
 
         }
 
     }
 
     private void criar() {
-        Produto produto = controller.criar(criarDialog()); console.printf(produto.toString());
+        Produto produto = controller.criar(criarDialog());
+        console.printf(produto.toString());
     }
 
     private void alterar() {

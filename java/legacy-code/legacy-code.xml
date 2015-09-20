@@ -1,176 +1,180 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="legacy-code" default="all">
-  
-  
-  <property file="legacy-code.properties"/>
-  <!-- Uncomment the following property if no tests compilation is needed -->
-  <!-- 
-  <property name="skip.tests" value="true"/>
-   -->
-  
-  <!-- Compiler options -->
-  
-  <property name="compiler.debug" value="on"/>
-  <property name="compiler.generate.no.warnings" value="off"/>
-  <property name="compiler.args" value=""/>
-  <property name="compiler.max.memory" value="700m"/>
-  <patternset id="ignored.files">
-    <exclude name="**/*.hprof/**"/>
-    <exclude name="**/*.pyc/**"/>
-    <exclude name="**/*.pyo/**"/>
-    <exclude name="**/*.rbc/**"/>
-    <exclude name="**/*~/**"/>
-    <exclude name="**/.DS_Store/**"/>
-    <exclude name="**/.bundle/**"/>
-    <exclude name="**/.git/**"/>
-    <exclude name="**/.hg/**"/>
-    <exclude name="**/.svn/**"/>
-    <exclude name="**/.tox/**"/>
-    <exclude name="**/CVS/**"/>
-    <exclude name="**/RCS/**"/>
-    <exclude name="**/SCCS/**"/>
-    <exclude name="**/__pycache__/**"/>
-    <exclude name="**/_svn/**"/>
-    <exclude name="**/rcs/**"/>
-    <exclude name="**/vssver.scc/**"/>
-    <exclude name="**/vssver2.scc/**"/>
-  </patternset>
-  <patternset id="library.patterns">
-    <include name="*.zip"/>
-    <include name="*.apk"/>
-    <include name="*.war"/>
-    <include name="*.egg"/>
-    <include name="*.ear"/>
-    <include name="*.ane"/>
-    <include name="*.swc"/>
-    <include name="*.jar"/>
-  </patternset>
-  <patternset id="compiler.resources">
-    <exclude name="**/?*.java"/>
-    <exclude name="**/?*.form"/>
-    <exclude name="**/?*.class"/>
-    <exclude name="**/?*.groovy"/>
-    <exclude name="**/?*.scala"/>
-    <exclude name="**/?*.flex"/>
-    <exclude name="**/?*.kt"/>
-    <exclude name="**/?*.clj"/>
-    <exclude name="**/?*.aj"/>
-  </patternset>
-  
-  <!-- JDK definitions -->
-  
-  <property name="jdk.bin.1.6" value="${jdk.home.1.6}/bin"/>
-  <path id="jdk.classpath.1.6">
-    <fileset dir="${jdk.home.1.6}">
-      <include name="jre/lib/charsets.jar"/>
-      <include name="jre/lib/plugin.jar"/>
-      <include name="jre/lib/resources.jar"/>
-      <include name="jre/lib/deploy.jar"/>
-      <include name="jre/lib/management-agent.jar"/>
-      <include name="jre/lib/rt.jar"/>
-      <include name="jre/lib/javaws.jar"/>
-      <include name="jre/lib/jsse.jar"/>
-      <include name="jre/lib/jce.jar"/>
-      <include name="jre/lib/ext/sunjce_provider.jar"/>
-      <include name="jre/lib/ext/dnsns.jar"/>
-      <include name="jre/lib/ext/sunpkcs11.jar"/>
-      <include name="jre/lib/ext/localedata.jar"/>
-    </fileset>
-  </path>
-  
-  <property name="project.jdk.home" value="${jdk.home.1.6}"/>
-  <property name="project.jdk.bin" value="${jdk.bin.1.6}"/>
-  <property name="project.jdk.classpath" value="jdk.classpath.1.6"/>
-  
-  <!-- Modules -->
-  
-  
-  <!-- Module legacy-code -->
-  
-  <dirname property="module.legacy-code.basedir" file="${ant.file}"/>
-  
-  
-  <property name="module.jdk.home.legacy-code" value="${project.jdk.home}"/>
-  <property name="module.jdk.bin.legacy-code" value="${project.jdk.bin}"/>
-  <property name="module.jdk.classpath.legacy-code" value="${project.jdk.classpath}"/>
-  
-  <property name="compiler.args.legacy-code" value="-encoding UTF-8 -source 1.6 ${compiler.args}"/>
-  
-  <property name="legacy-code.output.dir" value="${module.legacy-code.basedir}/out/production/legacy-code"/>
-  <property name="legacy-code.testoutput.dir" value="${module.legacy-code.basedir}/out/test/legacy-code"/>
-  
-  <path id="legacy-code.module.bootclasspath">
-    <!-- Paths to be included in compilation bootclasspath -->
-  </path>
-  
-  <path id="legacy-code.module.production.classpath">
-    <path refid="${module.jdk.classpath.legacy-code}"/>
-  </path>
-  
-  <path id="legacy-code.runtime.production.module.classpath">
-    <pathelement location="${legacy-code.output.dir}"/>
-  </path>
-  
-  <path id="legacy-code.module.classpath">
-    <path refid="${module.jdk.classpath.legacy-code}"/>
-    <pathelement location="${legacy-code.output.dir}"/>
-  </path>
-  
-  <path id="legacy-code.runtime.module.classpath">
-    <pathelement location="${legacy-code.testoutput.dir}"/>
-    <pathelement location="${legacy-code.output.dir}"/>
-  </path>
-  
-  
-  <patternset id="excluded.from.module.legacy-code">
-    <patternset refid="ignored.files"/>
-  </patternset>
-  
-  <patternset id="excluded.from.compilation.legacy-code">
-    <patternset refid="excluded.from.module.legacy-code"/>
-  </patternset>
-  
-  <path id="legacy-code.module.sourcepath">
-    <dirset dir="${module.legacy-code.basedir}">
-      <include name="src"/>
-    </dirset>
-  </path>
-  
-  
-  <target name="compile.module.legacy-code" depends="compile.module.legacy-code.production,compile.module.legacy-code.tests" description="Compile module legacy-code"/>
-  
-  <target name="compile.module.legacy-code.production" description="Compile module legacy-code; production classes">
-    <mkdir dir="${legacy-code.output.dir}"/>
-    <javac destdir="${legacy-code.output.dir}" debug="${compiler.debug}" nowarn="${compiler.generate.no.warnings}" memorymaximumsize="${compiler.max.memory}" fork="true" executable="${module.jdk.bin.legacy-code}/javac">
-      <compilerarg line="${compiler.args.legacy-code}"/>
-      <bootclasspath refid="legacy-code.module.bootclasspath"/>
-      <classpath refid="legacy-code.module.production.classpath"/>
-      <src refid="legacy-code.module.sourcepath"/>
-      <patternset refid="excluded.from.compilation.legacy-code"/>
-    </javac>
-    
-    <copy todir="${legacy-code.output.dir}">
-      <fileset dir="${module.legacy-code.basedir}/src">
-        <patternset refid="compiler.resources"/>
-        <type type="file"/>
-      </fileset>
-    </copy>
-  </target>
-  
-  <target name="compile.module.legacy-code.tests" depends="compile.module.legacy-code.production" description="compile module legacy-code; test classes" unless="skip.tests"/>
-  
-  <target name="clean.module.legacy-code" description="cleanup module">
-    <delete dir="${legacy-code.output.dir}"/>
-    <delete dir="${legacy-code.testoutput.dir}"/>
-  </target>
-  
-  <target name="init" description="Build initialization">
-    <!-- Perform any build initialization in this target -->
-  </target>
-  
-  <target name="clean" depends="clean.module.legacy-code" description="cleanup all"/>
-  
-  <target name="build.modules" depends="init, clean, compile.module.legacy-code" description="build all modules"/>
-  
-  <target name="all" depends="build.modules" description="build all"/>
+
+
+    <property file="legacy-code.properties"/>
+    <!-- Uncomment the following property if no tests compilation is needed -->
+    <!--
+    <property name="skip.tests" value="true"/>
+     -->
+
+    <!-- Compiler options -->
+
+    <property name="compiler.debug" value="on"/>
+    <property name="compiler.generate.no.warnings" value="off"/>
+    <property name="compiler.args" value=""/>
+    <property name="compiler.max.memory" value="700m"/>
+    <patternset id="ignored.files">
+        <exclude name="**/*.hprof/**"/>
+        <exclude name="**/*.pyc/**"/>
+        <exclude name="**/*.pyo/**"/>
+        <exclude name="**/*.rbc/**"/>
+        <exclude name="**/*~/**"/>
+        <exclude name="**/.DS_Store/**"/>
+        <exclude name="**/.bundle/**"/>
+        <exclude name="**/.git/**"/>
+        <exclude name="**/.hg/**"/>
+        <exclude name="**/.svn/**"/>
+        <exclude name="**/.tox/**"/>
+        <exclude name="**/CVS/**"/>
+        <exclude name="**/RCS/**"/>
+        <exclude name="**/SCCS/**"/>
+        <exclude name="**/__pycache__/**"/>
+        <exclude name="**/_svn/**"/>
+        <exclude name="**/rcs/**"/>
+        <exclude name="**/vssver.scc/**"/>
+        <exclude name="**/vssver2.scc/**"/>
+    </patternset>
+    <patternset id="library.patterns">
+        <include name="*.zip"/>
+        <include name="*.apk"/>
+        <include name="*.war"/>
+        <include name="*.egg"/>
+        <include name="*.ear"/>
+        <include name="*.ane"/>
+        <include name="*.swc"/>
+        <include name="*.jar"/>
+    </patternset>
+    <patternset id="compiler.resources">
+        <exclude name="**/?*.java"/>
+        <exclude name="**/?*.form"/>
+        <exclude name="**/?*.class"/>
+        <exclude name="**/?*.groovy"/>
+        <exclude name="**/?*.scala"/>
+        <exclude name="**/?*.flex"/>
+        <exclude name="**/?*.kt"/>
+        <exclude name="**/?*.clj"/>
+        <exclude name="**/?*.aj"/>
+    </patternset>
+
+    <!-- JDK definitions -->
+
+    <property name="jdk.bin.1.6" value="${jdk.home.1.6}/bin"/>
+    <path id="jdk.classpath.1.6">
+        <fileset dir="${jdk.home.1.6}">
+            <include name="jre/lib/charsets.jar"/>
+            <include name="jre/lib/plugin.jar"/>
+            <include name="jre/lib/resources.jar"/>
+            <include name="jre/lib/deploy.jar"/>
+            <include name="jre/lib/management-agent.jar"/>
+            <include name="jre/lib/rt.jar"/>
+            <include name="jre/lib/javaws.jar"/>
+            <include name="jre/lib/jsse.jar"/>
+            <include name="jre/lib/jce.jar"/>
+            <include name="jre/lib/ext/sunjce_provider.jar"/>
+            <include name="jre/lib/ext/dnsns.jar"/>
+            <include name="jre/lib/ext/sunpkcs11.jar"/>
+            <include name="jre/lib/ext/localedata.jar"/>
+        </fileset>
+    </path>
+
+    <property name="project.jdk.home" value="${jdk.home.1.6}"/>
+    <property name="project.jdk.bin" value="${jdk.bin.1.6}"/>
+    <property name="project.jdk.classpath" value="jdk.classpath.1.6"/>
+
+    <!-- Modules -->
+
+
+    <!-- Module legacy-code -->
+
+    <dirname property="module.legacy-code.basedir" file="${ant.file}"/>
+
+
+    <property name="module.jdk.home.legacy-code" value="${project.jdk.home}"/>
+    <property name="module.jdk.bin.legacy-code" value="${project.jdk.bin}"/>
+    <property name="module.jdk.classpath.legacy-code" value="${project.jdk.classpath}"/>
+
+    <property name="compiler.args.legacy-code" value="-encoding UTF-8 -source 1.6 ${compiler.args}"/>
+
+    <property name="legacy-code.output.dir" value="${module.legacy-code.basedir}/out/production/legacy-code"/>
+    <property name="legacy-code.testoutput.dir" value="${module.legacy-code.basedir}/out/test/legacy-code"/>
+
+    <path id="legacy-code.module.bootclasspath">
+        <!-- Paths to be included in compilation bootclasspath -->
+    </path>
+
+    <path id="legacy-code.module.production.classpath">
+        <path refid="${module.jdk.classpath.legacy-code}"/>
+    </path>
+
+    <path id="legacy-code.runtime.production.module.classpath">
+        <pathelement location="${legacy-code.output.dir}"/>
+    </path>
+
+    <path id="legacy-code.module.classpath">
+        <path refid="${module.jdk.classpath.legacy-code}"/>
+        <pathelement location="${legacy-code.output.dir}"/>
+    </path>
+
+    <path id="legacy-code.runtime.module.classpath">
+        <pathelement location="${legacy-code.testoutput.dir}"/>
+        <pathelement location="${legacy-code.output.dir}"/>
+    </path>
+
+
+    <patternset id="excluded.from.module.legacy-code">
+        <patternset refid="ignored.files"/>
+    </patternset>
+
+    <patternset id="excluded.from.compilation.legacy-code">
+        <patternset refid="excluded.from.module.legacy-code"/>
+    </patternset>
+
+    <path id="legacy-code.module.sourcepath">
+        <dirset dir="${module.legacy-code.basedir}">
+            <include name="src"/>
+        </dirset>
+    </path>
+
+
+    <target name="compile.module.legacy-code"
+            depends="compile.module.legacy-code.production,compile.module.legacy-code.tests"
+            description="Compile module legacy-code"/>
+
+    <target name="compile.module.legacy-code.production" description="Compile module legacy-code; production classes">
+        <mkdir dir="${legacy-code.output.dir}"/>
+        <javac destdir="${legacy-code.output.dir}" debug="${compiler.debug}" nowarn="${compiler.generate.no.warnings}"
+               memorymaximumsize="${compiler.max.memory}" fork="true" executable="${module.jdk.bin.legacy-code}/javac">
+            <compilerarg line="${compiler.args.legacy-code}"/>
+            <bootclasspath refid="legacy-code.module.bootclasspath"/>
+            <classpath refid="legacy-code.module.production.classpath"/>
+            <src refid="legacy-code.module.sourcepath"/>
+            <patternset refid="excluded.from.compilation.legacy-code"/>
+        </javac>
+
+        <copy todir="${legacy-code.output.dir}">
+            <fileset dir="${module.legacy-code.basedir}/src">
+                <patternset refid="compiler.resources"/>
+                <type type="file"/>
+            </fileset>
+        </copy>
+    </target>
+
+    <target name="compile.module.legacy-code.tests" depends="compile.module.legacy-code.production"
+            description="compile module legacy-code; test classes" unless="skip.tests"/>
+
+    <target name="clean.module.legacy-code" description="cleanup module">
+        <delete dir="${legacy-code.output.dir}"/>
+        <delete dir="${legacy-code.testoutput.dir}"/>
+    </target>
+
+    <target name="init" description="Build initialization">
+        <!-- Perform any build initialization in this target -->
+    </target>
+
+    <target name="clean" depends="clean.module.legacy-code" description="cleanup all"/>
+
+    <target name="build.modules" depends="init, clean, compile.module.legacy-code" description="build all modules"/>
+
+    <target name="all" depends="build.modules" description="build all"/>
 </project>
