@@ -51,27 +51,7 @@ public class ProdutoDAO {
     }
 
     public Produto getProduct(Integer codigo) {
-        String query = "SELECT * FROM PRODUTOS WHERE ID = " + codigo.toString();
-        ResultSet rs = null;
-        try {
-            Statement statement = null;
-            statement = conn.createStatement();
-            rs = statement.executeQuery(query.toString());
-
-            Integer id = rs.getInt("id");
-            String nome = rs.getString("nome");
-            String descricao = rs.getString("descricao");
-            BigDecimal preco = rs.getBigDecimal("preco");
-            String marca = rs.getString("marca");
-            String ean = rs.getString("ean");
-            String apelido = rs.getString("apelido");
-            String unidadeMedida = rs.getString("unidademedida");
-            return Produto.createInstance(id, nome, descricao, preco, marca, ean, apelido, unidadeMedida);
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return null;
+        return getListaProdutosFromQuery("SELECT * FROM PRODUTOS WHERE ID = " + codigo.toString()).get(0);
     }
 
     public List<Produto> list() {

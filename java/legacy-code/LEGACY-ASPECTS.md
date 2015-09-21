@@ -15,6 +15,7 @@ Nao pode ter produto com mesmo nome ou ean code (case insensitive)
 Nome descrição preco marca ean apelido unidademedida
 Sql (sqlite ou mysql)...mais enterprise
 
+todo: calcular imposto e margem de lucro no preço antes de salvar
 ==
 
 tocar generator
