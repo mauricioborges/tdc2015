@@ -4,7 +4,15 @@ import java.util.List;
 
 public class ProdutoController {
 
-    private ProdutoDAO dao = new ProdutoDAO(Env.CONNECTION_DATA);
+    private ProdutoDAO dao;
+
+    public ProdutoController(ProdutoDAO dao) {
+        this.dao = dao;
+    }
+
+    public ProdutoController() {
+        this.dao = new ProdutoDAO(Env.CONNECTION_DATA);
+    }
 
     public List<Produto> listar() {
         return dao.list();
