@@ -12,6 +12,9 @@ dependencies {
     testCompile 'org.spockframework:spock-core:1.0-groovy-2.4'
     testCompile files('.lib/sqlite-jdbc-3.8.11.1.jar')
     testCompile files('out/production/legacy-code')
+    testCompile ('com.athaydes:spock-reports:1.2.7'){
+        transitive = false
+    }
 }
 ant.importBuild('legacy-code.xml'){ antTargetName ->
     'a-' + antTargetName

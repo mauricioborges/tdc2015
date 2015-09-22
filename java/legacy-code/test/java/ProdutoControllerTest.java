@@ -8,7 +8,7 @@ import tdc2015.legacy.produto.ProdutoController;
 public class ProdutoControllerTest extends TestCase {
 
     @Test
-    public void testMe() {
+    public void testIfYouCanCreateAProdutoControllerInstance() {
         assertNotNull(new ProdutoController());
     }
 }

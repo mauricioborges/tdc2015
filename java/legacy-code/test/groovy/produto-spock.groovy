@@ -3,13 +3,11 @@ import tdc2015.legacy.produto.ProdutoController
 
 class ProdutoControllerTestingSpock extends Specification {
 
-    def "should i stay"(){
-        given:
+    def "should be able to create a controller's instance when needed"(){
+        given: "that I try to create a ProdutoController instance"
             def controller = new ProdutoController();
-        when:
-            def produtoCriado = controller.criar(null);
-        then:
-        produtoCriado is(null)
+        expect: "that the controller instance is not null"
+            controller is.not(null)
     }
 
 }

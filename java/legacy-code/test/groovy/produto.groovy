@@ -1,5 +1,7 @@
+import tdc2015.legacy.produto.ProdutoController
+
 class ProdutoControllerTesting extends GroovyTestCase {
-    void testMe(){
-        assert 1 == 2
+    void "test if it's possible to create a ProdutoController instance"(){
+        assert new ProdutoController() != null
     }
 }
