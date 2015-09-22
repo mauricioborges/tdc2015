@@ -5,7 +5,7 @@ import tdc2015.legacy.produto.ProdutoController;
 /**
  * Created by mauricio on 21/09/15.
  */
-public class ProdutoControllerTest extends TestCase {
+public class ProdutoControllerJavaTesting extends TestCase {
 
     @Test
     public void testIfYouCanCreateAProdutoControllerInstance() {
