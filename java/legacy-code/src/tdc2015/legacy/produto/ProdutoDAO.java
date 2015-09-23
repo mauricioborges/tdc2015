@@ -11,6 +11,10 @@ import java.util.List;
 public class ProdutoDAO {
     private Connection conn = null;
 
+    public ProdutoDAO(Connection conn) {
+        this.conn = conn;
+
+    }
     public ProdutoDAO(String connectionData) {
         try {
             Class.forName("org.sqlite.JDBC");
