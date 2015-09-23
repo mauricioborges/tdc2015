@@ -15,6 +15,7 @@ dependencies {
         transitive = false
     }
     testCompile "org.mockito:mockito-core:1.+"
+    testCompile "cglib:cglib-nodep:2.2"
 
     testCompile files('.lib/sqlite-jdbc-3.8.11.1.jar')
     testCompile files('out/production/legacy-code')
