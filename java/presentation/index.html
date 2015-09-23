@@ -102,18 +102,22 @@
                     <h1>Como funciona a aplicação hoje?</h1>
                     <a href="chrome-extension://pnhechapfaindjhompbnflcldabbghjo/html/nassh.html#profile-id:b0d8" target="_blank">assim!</a>
 				</section>
-				<section data-markdown>
-                    # Passo a passo que eu escolhi:
-
-                    1. preparar um build rápido e que não altere o build do projeto atual
-                    1. escrever um teste que instancie a classe em questão:
-                     1. precisei alterar o código levemente para permitir uma minima injeção de dependência
-                    1. escrever testes que caracterizem o local que eu devo alterar
-                    1. whaaat! Caracterizei parte de um lugar que não serviu para o problema em questão
+				<section>
+                    <section data-markdown>
+                    # Passo a passo
+                    
+                    > Fortemente baseado na bibliografia de Feathers
 
                     Note:
                     A inclusão ou não de dependências é um ponto importante. Com Spock + uso de interfaces fica apenas o spock, sem "escolha" de frameworks adicionais. Note como é bom entender o código com caracterização. Ainda que eu encontre um possível problema de design (DAO com todas as regras de negócio), eu pelo menos consegui escrever um monte de testes para uma parte do código
+                    </section>
 
+                    <section data-markdown>preparar um [script de build](file:///home/mauricio/work/tdc2015/java/legacy-code/build.gradle) que não altere o build do projeto atual</section>
+
+                    <section data-markdown>escrever um teste que instancie a classe onde você (acha que) deve alterar</section>
+                    <section data-markdown>CUIDADO: se precisar fazer alterações mínimas, não intrusivas e preferencialmente daquelas que podem ser feitas automaticamente pela IDE, faça. Com calma...</section>
+                    <section data-markdown>escrever testes que caracterizem o local que eu devo alterar</section>
+                    <section data-markdown>whaaat! Caracterizei parte de um lugar que não serviu para o problema em questão</section>
 
 				</section>
 			</div>
