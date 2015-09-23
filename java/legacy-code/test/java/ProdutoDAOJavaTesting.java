@@ -2,7 +2,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
-    import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized;
 import tdc2015.legacy.produto.ProdutoDAO;
 
 import java.sql.Connection;
@@ -37,10 +37,17 @@ public class ProdutoDAOJavaTesting {
     public ProdutoDAOJavaTesting(String dadosProduto, String generatedSQL) {
         this.dadosProduto = dadosProduto;
         this.generatedSQL = generatedSQL;
-
     }
+
     @Test
-    public void testIfYouCanCreateAProdutoDAOInstance() {
+    public void caracterizeTheDefaultDAOConstructor() {
+        thrown.expect(RuntimeException.class);
+        thrown.expectMessage("java.lang.ClassNotFoundException: org.sqlite.JDBC");
+        new ProdutoDAO("");
+    }
+
+    @Test
+    public void caracterizeTheConstructorWithConnectionAsParameter() {
         assertThat(new ProdutoDAO(mock(Connection.class)), is(not(nullValue())));
     }
 
@@ -48,15 +55,12 @@ public class ProdutoDAOJavaTesting {
     public void testDifferentCreateProductCalls() throws SQLException {
         Connection mockedConn = mock(Connection.class);
         PreparedStatement mockedStatement = mock(PreparedStatement.class);
-        ResultSet mockedResultSet = mock(ResultSet.class);
+        stub(mockedStatement.getGeneratedKeys()).toReturn(mock(ResultSet.class));
         when(mockedConn.createStatement()).thenReturn(mockedStatement);
-        when(mockedStatement.getGeneratedKeys()).thenReturn(mockedResultSet);
-
-        ProdutoDAO dao = new ProdutoDAO(mockedConn);
-        is(dao.createProduct(dadosProduto).getClass()).equals(Integer.class);
+        new ProdutoDAO(mockedConn).createProduct(dadosProduto);
         verify(mockedStatement, times(1)).executeUpdate(generatedSQL);
-
     }
+
     @Test
     public void testCallingCreateProductWithNull() throws SQLException {
         Connection mockedConn = mock(Connection.class);
@@ -70,13 +74,5 @@ public class ProdutoDAOJavaTesting {
         dao.createProduct(null);
 
     }
-    /*
-    criar um caso de teste para:
-    - createProduct("")
-    - createProduct(null)
-    - createProduct("a;b;c;d;e")
-    - createProduct("um que funcione de verdade")
-     */
-
 
 }

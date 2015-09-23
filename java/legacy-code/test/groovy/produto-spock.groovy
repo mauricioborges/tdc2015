@@ -5,6 +5,10 @@ import tdc2015.legacy.produto.ProdutoDAO
 
 import java.sql.Connection
 import java.sql.PreparedStatement
+import java.sql.ResultSet
+
+import static org.mockito.Mockito.mock
+import static org.mockito.Mockito.when
 
 class ProdutoControllerSpockTesting extends Specification {
 
@@ -14,12 +18,8 @@ class ProdutoControllerSpockTesting extends Specification {
     }
 
     def "should be able to create a controller's instance using a mocked DAO"() {
-        given:
-        def mockedDAO = Mock(ProdutoDAO)
-        when:
-        new ProdutoController(mockedDAO).listar()
-        then:
-        1 * mockedDAO.list()
+        expect:
+        new ProdutoController(Mock(ProdutoDAO)) != null
     }
 
     def "should be able to stub dao when calling criar()"() {
@@ -60,11 +60,6 @@ class ProdutoControllerSpockTesting extends Specification {
 
 class ProdutoDAOSpockTesting extends Specification {
 
-    def "should be able to create a dao's instance when needed"() {
-        expect: 'then when I pass a connection instance it should behave ok'
-        new ProdutoDAO({} as Connection) != null
-    }
-
     def "should throw exception when using default DAO constructor"() {
         when: " creating a default instance, passing the db instance location"
         new ProdutoDAO(_ as String)
@@ -73,19 +68,25 @@ class ProdutoDAOSpockTesting extends Specification {
         ex.message == "java.lang.ClassNotFoundException: org.sqlite.JDBC"
     }
 
+    def "should be able to create a dao's instance when needed"() {
+        expect: 'then when I pass a connection instance it should behave ok'
+        new ProdutoDAO({} as Connection) != null
+    }
+
     def "caracterization of createProduct according to string parameter"(String data, String sql) {
-        given: "given a mocked connection which stubs the createStatement call"
-        def mockedStatement = Stub(PreparedStatement)
+        given: "a mocked connection which stubs the createStatement call"
+        def mockedStatement = Mock(PreparedStatement) {
+            getGeneratedKeys() >> Stub(ResultSet)
+        }
         def mockedConn = Mock(Connection) {
             createStatement() >> mockedStatement
         }
-        when:
-        "I try to create a product using ${data} as string data"
 
+        when: "I try to create a product using the data value as parameter"
         new ProdutoDAO(mockedConn).createProduct(data)
-        then:
-        "it should use ${sql} while updating the database"
-        mockedStatement.executeUpdate(sql) >> 0
+
+        then: "it should use the sql string while updating the database"
+        1 * mockedStatement.executeUpdate(sql)
 
         where:
         data                                                                              | sql
@@ -94,6 +95,4 @@ class ProdutoDAOSpockTesting extends Specification {
         ""                                                                                | 'INSERT INTO PRODUTOS VALUES(NULL, "");'
 
     }
-
-
 }
