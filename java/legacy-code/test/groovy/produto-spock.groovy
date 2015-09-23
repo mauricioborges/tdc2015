@@ -4,6 +4,8 @@ import tdc2015.legacy.produto.ProdutoController
 import tdc2015.legacy.produto.ProdutoDAO
 
 import java.sql.Connection
+import java.sql.PreparedStatement
+import java.sql.ResultSet
 
 class ProdutoControllerSpockTesting extends Specification {
 
@@ -64,5 +66,26 @@ class ProdutoDAOSpockTesting extends Specification {
         expect:
         new ProdutoDAO({} as Connection) != null
     }
+
+    def "caracterize createProduct according to string parameter"(String data, String sql) {
+        given:
+        def mockedStatement = Stub(PreparedStatement)
+        def mockedConn = Mock(Connection) {
+            createStatement() >> mockedStatement
+        }
+        when:
+
+        new ProdutoDAO(mockedConn).createProduct(data)
+        then:
+        mockedStatement.executeUpdate(sql) >> 0
+
+        where:
+        data                                                                              | sql
+        'nome_produto;descricao_produto;100;marca_produto;ean_produto;apelido_produto;UN' | 'INSERT INTO PRODUTOS VALUES(NULL, "nome_produto", "descricao_produto", 100, "marca_produto", "ean_produto", "apelido_produto", "UN");'
+        'a;b;c;d;e'                                                                       | 'INSERT INTO PRODUTOS VALUES(NULL, "a", "b", c, "d", "e");'
+        ""                                                                                | 'INSERT INTO PRODUTOS VALUES(NULL, "");'
+
+    }
+
 
 }
