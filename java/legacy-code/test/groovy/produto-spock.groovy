@@ -5,7 +5,6 @@ import tdc2015.legacy.produto.ProdutoDAO
 
 import java.sql.Connection
 import java.sql.PreparedStatement
-import java.sql.ResultSet
 
 class ProdutoControllerSpockTesting extends Specification {
 
@@ -37,9 +36,8 @@ class ProdutoControllerSpockTesting extends Specification {
         given:
         def mockedDAO = Mock(ProdutoDAO)
         when:
-        def produto = new ProdutoController(mockedDAO).criar("a;b;c;d;e")
+        new ProdutoController(mockedDAO).criar("a;b;c;d;e")
         then:
-        produto.is(null)
         1 * mockedDAO.buscaPorEAN(_ as String) >> []
         1 * mockedDAO.buscaPorNome(_ as String) >> []
     }
@@ -63,20 +61,30 @@ class ProdutoControllerSpockTesting extends Specification {
 class ProdutoDAOSpockTesting extends Specification {
 
     def "should be able to create a dao's instance when needed"() {
-        expect:
+        expect: 'then when I pass a connection instance it should behave ok'
         new ProdutoDAO({} as Connection) != null
     }
 
-    def "caracterize createProduct according to string parameter"(String data, String sql) {
-        given:
+    def "should throw exception when using default DAO constructor"() {
+        when: " creating a default instance, passing the db instance location"
+        new ProdutoDAO(_ as String)
+        then: "it should throw an exception, as the driver is not present here"
+        RuntimeException ex = thrown()
+        ex.message == "java.lang.ClassNotFoundException: org.sqlite.JDBC"
+    }
+
+    def "caracterization of createProduct according to string parameter"(String data, String sql) {
+        given: "given a mocked connection which stubs the createStatement call"
         def mockedStatement = Stub(PreparedStatement)
         def mockedConn = Mock(Connection) {
             createStatement() >> mockedStatement
         }
         when:
+        "I try to create a product using ${data} as string data"
 
         new ProdutoDAO(mockedConn).createProduct(data)
         then:
+        "it should use ${sql} while updating the database"
         mockedStatement.executeUpdate(sql) >> 0
 
         where:
