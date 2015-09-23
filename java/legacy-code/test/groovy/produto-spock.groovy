@@ -3,6 +3,8 @@ import tdc2015.legacy.produto.Produto
 import tdc2015.legacy.produto.ProdutoController
 import tdc2015.legacy.produto.ProdutoDAO
 
+import java.sql.Connection
+
 class ProdutoControllerSpockTesting extends Specification {
 
     def "should be able to create a controller's instance when needed"() {
@@ -54,4 +56,13 @@ class ProdutoControllerSpockTesting extends Specification {
         !produto.is(null)
 
     }
+}
+
+class ProdutoDAOSpockTesting extends Specification {
+
+    def "should be able to create a dao's instance when needed"() {
+        expect:
+        new ProdutoDAO({} as Connection) != null
+    }
+
 }

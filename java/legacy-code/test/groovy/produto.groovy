@@ -1,6 +1,8 @@
 import tdc2015.legacy.produto.ProdutoController
 import tdc2015.legacy.produto.ProdutoDAO
 
+import java.sql.Connection
+
 import static org.mockito.Mockito.*
 
 class ProdutoControllerGroovyTesting extends GroovyTestCase {
@@ -26,5 +28,11 @@ class ProdutoControllerGroovyTesting extends GroovyTestCase {
         verify(mockedDAO, times(1)).buscaPorNome("a")
         verify(mockedDAO, times(1)).createProduct("a;b;c;d;e")
         verify(mockedDAO, times(1)).getProduct(anyInt())
+    }
+}
+
+class ProdutoDAOGroovyTesting extends GroovyTestCase {
+    void "test if you can create an instance"(){
+        assert new ProdutoDAO({} as Connection) !=null;
     }
 }
