@@ -7,9 +7,6 @@ import java.sql.Connection
 import java.sql.PreparedStatement
 import java.sql.ResultSet
 
-import static org.mockito.Mockito.mock
-import static org.mockito.Mockito.when
-
 class ProdutoControllerSpockTesting extends Specification {
 
     def "should be able to create a controller's instance when needed"() {
