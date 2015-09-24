@@ -6,11 +6,14 @@ import tdc2015.legacy.produto.ProdutoException;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.mockito.Matchers.anyInt;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 public class ProdutoControllerJavaTesting {
+
+    @Test
+    public void testIfYouCanCreateASimpleProdutoControllerInstance() {
+        assertThat(new ProdutoController(), is(not(nullValue())));
+    }
 
     @Test
     public void testIfYouCanCreateAProdutoControllerInstance() {

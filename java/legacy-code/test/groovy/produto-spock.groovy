@@ -9,6 +9,12 @@ import java.sql.ResultSet
 
 class ProdutoControllerSpockTesting extends Specification {
 
+    def "should be able to create a controller's instance"() {
+        expect:
+        new ProdutoController() != null
+    }
+
+
     def "should be able to create a controller's instance when needed"() {
         expect:
         new ProdutoController(null) != null
@@ -65,12 +71,12 @@ class ProdutoDAOSpockTesting extends Specification {
         ex.message == "java.lang.ClassNotFoundException: org.sqlite.JDBC"
     }
 
-    def "should be able to create a dao's instance when needed"() {
+    def "should be able to create an instance of DAO when needed"() {
         expect: 'then when I pass a connection instance it should behave ok'
         new ProdutoDAO({} as Connection) != null
     }
 
-    def "caracterization of createProduct according to string parameter"(String data, String sql) {
+    def "characterization of createProduct according to string parameter"(String data, String sql) {
         given: "a mocked connection which stubs the createStatement call"
         def mockedStatement = Mock(PreparedStatement) {
             getGeneratedKeys() >> Stub(ResultSet)
