@@ -52,8 +52,9 @@
                     
                     * Legado. Quem nunca?
                     * Um exemplo nada real
-                    * Por que Groovy?
-                    * Comparação entre testes Java e Groovy
+                    * Passo a passo
+                    * Errata
+                    * Porque Groovy?
 				</section>
 				<section data-markdown>
                     ## Legado. Quem nunca?
@@ -92,11 +93,25 @@
                         Então agora o sistema está rodando em produção, tudo está tranquilo, mas vai ser necessária uma alteração...zinha
                     </section>
 				</section>
-				<section data-markdown>
-                    # Requisito:
-                    Adicionar um cálculo no código para adicionar 0.20% ao preço informado antes de gravar no banco
-                    Note:
-                    Aqui eu mostro como funciona o glorioso sistema, e como tá o código hoje: mostrar a classe main, a classe ProdutoView o o Controller
+				<section>
+                    <section data-markdown>
+                        # Requisito:
+                        Adicionar um cálculo no código para adicionar 0.20% ao preço informado antes de gravar no banco
+                        Note:
+                        Aqui eu mostro como funciona o glorioso sistema, e como tá o código hoje: mostrar a classe main, a classe ProdutoView o o Controller
+                    </section>
+                    <section data-markdown>
+                        # Ou seja:
+
+                        |preço informado|preço salvo|
+                        |---------------|-----------|
+                        |R$ 100         |R$ 100,20  |
+                        |R$ 42          |R$ 42,084  |
+                        |R$ 0           |R$ 0       |
+
+                        Note:
+                        Aqui eu mostro como funciona o glorioso sistema, e como tá o código hoje: mostrar a classe main, a classe ProdutoView o o Controller
+                    </section>
 				</section>
 				<section>
                     <h1>Como funciona a aplicação hoje?</h1>
@@ -112,22 +127,291 @@
                     A inclusão ou não de dependências é um ponto importante. Com Spock + uso de interfaces fica apenas o spock, sem "escolha" de frameworks adicionais. Note como é bom entender o código com caracterização. Ainda que eu encontre um possível problema de design (DAO com todas as regras de negócio), eu pelo menos consegui escrever um monte de testes para uma parte do código
                     </section>
 
-                    <section data-markdown>preparar um [script de build](file:///home/mauricio/work/tdc2015/java/legacy-code/build.gradle) que não altere o build do projeto atual</section>
+                    <section data-markdown>preparar um script de build que não altere o build do projeto atual</section>
+<section><h2>build.gradle</h2><pre  data-trim contenteditable class="groovy"><code>
+apply plugin: 'groovy'
+apply plugin: 'java'
+apply plugin: 'idea'
 
-                    <section data-markdown>escrever um teste que instancie a classe onde você (acha que) deve alterar</section>
+repositories {
+    jcenter()
+}
+
+dependencies {
+    testCompile 'org.codehaus.groovy:groovy-all:2.4.4'
+    testCompile 'junit:junit:4.12'
+    testCompile 'org.spockframework:spock-core:1.0-groovy-2.4'
+    testCompile 'org.hamcrest:hamcrest-junit:2.0.0.0'
+    testCompile ('com.athaydes:spock-reports:1.2.7'){
+        transitive = false
+    }
+    testCompile "org.mockito:mockito-core:1.+"
+    testCompile "cglib:cglib-nodep:2.2"
+
+    //dependencies from legacy project
+    testCompile files('.lib/sqlite-jdbc-3.8.11.1.jar')
+    testCompile files('out/production/legacy-code')
+}
+// importing legacy build script into this script
+ant.importBuild('legacy-code.xml'){ antTargetName ->
+    'a-' + antTargetName
+}
+// add legacy basic build to compile workflow
+compileJava.dependsOn 'a-all'
+
+// changed sourceSets to avoid path collision (due to non-standard legacy config)
+sourceSets {
+    test {
+        java {
+            srcDir 'test/java'
+        }
+        groovy {
+            srcDir 'test/groovy'
+        }
+    }
+}
+</code></pre></section>
+
+                    <section data-markdown>
+                        escrever um teste que instancie a classe onde você (acha que) deve alterar
+                        Note:
+                        aqui tu pode abrir um arquivo java e criar uma classe para testar. e depois um groovy. Colas em cola.txt
+                </section>
+<section>
+<h2>Java</h2>
+<pre  data-trim contenteditable class="java"><code>
+import org.junit.Test;
+import tdc2015.legacy.produto.ProdutoController;
+
+import static org.junit.Assert.assertNotNull;
+
+public class ProdutoControllerJavaTesting {
+
+    @Test
+    public void testIfYouCanCreateAProdutoControllerInstance() {
+        assertNotNull(new ProdutoController(null));
+    }
+}
+</code></pre>
+</section>
+<section>
+<h2>Groovy</h2>
+<pre  data-trim contenteditable class="groovy"><code>
+import tdc2015.legacy.produto.ProdutoController
+
+class ProdutoControllerGroovyTesting extends GroovyTestCase {
+
+    void "test if it's possible to create a ProdutoController instance"() {
+        assert new ProdutoController(null) != null
+    }
+}
+</code></pre>
+<h2>Groovy+Spock</h2>
+<pre  data-trim contenteditable class="groovy"><code>
+import spock.lang.Specification
+import tdc2015.legacy.produto.ProdutoController
+
+class ProdutoControllerSpockTest extends Specification {
+
+    def "should be able to create a controller's instance when needed"() {
+        expect:
+        new ProdutoController(null) != null
+    }
+}
+</code></pre>
+<aside class="notes">
+Notar as diferenças: o nome do metodo pode ser um string. Groovy tem já uma classe de teste embutida que herda de junit, permitindo escrever testes sem adicionar bibliotecas novas. Notar que tem menos palavras no teste em groovy. O teste em groovy tem menos elementos que não interessam no momento para alguém que está brincando com um código que não conhece direito e/ou tem sérios problemas estruturais. Mostrar as criações de testes que eu fiz em spock e java, lá nos *aracterizando*
+</aside>
+</section>
                     <section data-markdown>CUIDADO: se precisar fazer alterações mínimas, não intrusivas e preferencialmente daquelas que podem ser feitas automaticamente pela IDE, faça. Com calma...</section>
+<section>
+<pre data-trim contenteditable class="java"><code>
+package tdc2015.legacy.produto;
+
+import java.util.List;
+
+public class ProdutoController {
+
+    private ProdutoDAO dao;
+
+    //WARNING!! construtor para testes
+    public ProdutoController(ProdutoDAO dao) {
+        this.dao = dao;
+    }
+
+    //construtor original
+    public ProdutoController() {
+        this.dao = new ProdutoDAO(Env.CONNECTION_DATA);
+    }
+// ...
+}
+</code></pre>
+</section>
                     <section data-markdown>escrever testes que caracterizem o local que eu devo alterar</section>
-                    <section data-markdown>whaaat! Caracterizei parte de um lugar que não serviu para o problema em questão</section>
+<section>
+<pre data-trim contenteditable class="java"><code>
+import org.junit.Test;
+import tdc2015.legacy.produto.ProdutoController;
+import tdc2015.legacy.produto.ProdutoDAO;
+import tdc2015.legacy.produto.ProdutoException;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.*;
+import static org.mockito.Matchers.anyInt;
+import static org.mockito.Mockito.*;
+
+public class ProdutoControllerJavaTesting {
+
+    @Test
+    public void testIfYouCanCreateAProdutoControllerInstance() {
+        assertThat(new ProdutoController(null), is(not(nullValue())));
+    }
+
+    @Test
+    public void testIfYouCanCreateAProdutoControllerInstanceWithAMockedDAO() {
+        ProdutoDAO mockedDAO = mock(ProdutoDAO.class);
+        new ProdutoController(mockedDAO).listar();
+        verify(mockedDAO, times(1)).list();
+    }
+
+    @Test(expected = ArrayIndexOutOfBoundsException.class)
+    public void testCreateParametersBehaviour1() throws ProdutoException {
+        ProdutoDAO mockedDAO = mock(ProdutoDAO.class);
+        new ProdutoController(mockedDAO).criar("");
+    }
+
+    @Test
+    public void testCreateParametersBehaviour2() throws ProdutoException {
+        ProdutoDAO mockedDAO = mock(ProdutoDAO.class);
+        new ProdutoController(mockedDAO).criar("a;b;c;d;e");
+        verify(mockedDAO, times(1)).buscaPorEAN("e");
+        verify(mockedDAO, times(1)).buscaPorNome("a");
+        verify(mockedDAO, times(1)).createProduct("a;b;c;d;e");
+        verify(mockedDAO, times(1)).getProduct(anyInt());
+
+    }
+}
+</code></pre>
+</section>
+<section>
+<pre data-trim contenteditable class="groovy"><code>
+import spock.lang.Specification
+import tdc2015.legacy.produto.Produto
+import tdc2015.legacy.produto.ProdutoController
+import tdc2015.legacy.produto.ProdutoDAO
+
+class ProdutoControllerSpockTesting extends Specification {
+
+    def "should be able to create a controller's instance when needed"() {
+        expect:
+        new ProdutoController(null) != null
+    }
+
+    def "should be able to create a controller's instance using a mocked DAO"() {
+        expect:
+        new ProdutoController(Mock(ProdutoDAO)) != null
+    }
+
+    def "should be able to stub dao when calling criar()"() {
+        given: "a stubbed DAO which always return ok"
+        def mockedDAO = Stub(ProdutoDAO)
+        when: "i use it to manipulate my database"
+        def produto = new ProdutoController(mockedDAO).criar("a;b;c;d;e")
+        then: "it should return a not null product code"
+        !produto.is(null)
+
+    }
+
+    def "should be able to mock dao when calling criar()"() {
+        given:"a mocked dao"
+        def mockedDAO = Mock(ProdutoDAO)
+        when:" I use it to call product creation"
+        new ProdutoController(mockedDAO).criar("a;b;c;d;e")
+        then: "i should be able to mock responses accordingly, verifying it in the end of the test"
+        1 * mockedDAO.buscaPorEAN(_ as String) >> []
+        1 * mockedDAO.buscaPorNome(_ as String) >> []
+    }
+
+    def "should be able to mock dao exceptions when calling criar() with other syntax"() {
+        setup: "mocks which gonna be checked"
+        def mockedDAO = Mock(ProdutoDAO) {
+            1 * buscaPorEAN("e") >> []
+            1 * buscaPorNome("a") >> []
+            1 * createProduct("a;b;c;d;e") >> 1
+            1 * getProduct(1) >> Mock(Produto)
+        }
+        when: "creating a product using mocks"
+        def produto = new ProdutoController(mockedDAO).criar("a;b;c;d;e")
+        then: "it should return a not null product"
+        !produto.is(null)
+
+    }
+}
+
+</code></pre>
+</section>
+                    <section data-markdown>
+                        whaaat! Caracterizei parte de um lugar que não serviu para o problema em questão
+                        Note:
+                        explica porque, mostrando os códigos do controller e do DAO
+                    </section>
+                    <section data-markdown>Que bom!!! testei várias coisas...</section>
 
 				</section>
-			</div>
+				<section data-markdown>
+                        # Errata:
+                        
+                        Mas e as metaClasses, e os Traits, Mixins?
+				</section>
+				<section>
+                    <section data-markdown>
+                        # Por que Groovy?
+                        Note:
+                        abre o groovyconsole prá mostrar exemplos
+                    </section>
+                    <section data-markdown>
+                        expressividade
+                        Note:
+                        o groovy permite que se crie metodos com nome de string. tem assertions embutidas na classe GroovyTestCase alguns parenteses somem, regex operations, keyword assert. assertions bonitonas
+                    </section>
+                    <section data-markdown>
+                        assertividade
+                        Note:
+                        o groovy permite ignorar detalhes que não interessam. Tipos...retorno de método...try-catch...
+                    </section>
+                    <section data-markdown>
+                        Exceptions
+                        Note:
+                        shouldFail é d+! tira um monte de coisa do radar. O thrown do Spock, parecido com o do JUnit mas mais bonito, é demais tb
+                    </section>
+                    <section data-markdown>
+                        Test Double
+                        Note:
+                        vários jeitos de fazer mock. com closure, com map, com framework, com a classe MockFor, com o spock que tem mock embutido
+                    </section>
+                    <section data-markdown>
+                        Spock!
+                        Note:
+                        escrevendo testes como texto. output é sensacional. a ideia de EXIGIR sections nos testes é sensacional, orienta o pensamento a comportamento. teste naturalmente é uma DSL
+                    </section>
+                    <section data-markdown>
+                        comunicação
+                        Note:
+                        esse monte de texto que eu posso escrever é melhor que um comentario e aparece lá no report final...e o report do spock é ainda mais sensacional (mostrar reports)
+                    </section>
+                </section>
+                <section data-markdown>
+                    ## Em suma...
+                    Escrever teste em código legado é como ler um livro surreal e complexo. O Groovy (+Spock) permite tomar notas e fazer observações com mais velocidade, assertividade e abstraindo detalhes não tão importantes do Java
+                </section>
+            </div>
 
 		</div>
 
 		<script src="lib/js/head.min.js"></script>
 		<script src="js/reveal.js"></script>
 
-		<script>
+		e<script>
 
 			// Full list of configuration options available at:
 			// https://github.com/hakimel/reveal.js#configuration
