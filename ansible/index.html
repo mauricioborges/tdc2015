@@ -40,80 +40,105 @@
 
 			<!-- Any section element inside of this container is displayed as a slide -->
 			<div class="slides">
-				<section data-markdown>
-                    ## Agenda
-                    
-                    * Legado. Quem nunca?
-                    * Um exemplo nada real
-                    * Por que Groovy?
-                    * Comparação entre testes Java e Groovy
-				</section>
-				<section data-markdown>
-                    ## Legado. Quem nunca?
-                    
-                    > "There's no guarantee, It's not up to me, We can only see this is my legacy"
-                    >
-                    > Eminem, Legacy
-                    Note:
-                    é feio. é ruim. é cansativo. it's only legacy code, but I hate it!
-				</section>
-				<section data-markdown>
-                    > "**Code without tests is bad code**. It doesn't matter how well written it is; it doesn't matter how pretty or object-oriented or well-encapsulated it is."
-                    >
-                    > Michael C. Feathers, Working Effectively with Legacy Code
-                    
-                    Note: 
-                    Como bem sumarizou o Feathers no Working effectively with legacy code, código sem testes é ruim. Sem testes, não tem como mudar o código com confiança. E como é fácil fazer código legado: é um protótipo que vira produção sem um refactoring sequer, é a mudança que precisa ser entregue daqui a pouco ou haverá muita perda (será?). Sempre há um motivo
-				</section>
-				<section data-markdown>
-                    > "Se vivermos durante muito tempo, descobrimos que todas as vitórias, um dia, se transformam em derrotas."
-                    >
-                    > Simone de Beauvoir (pelo menos foi o que a internet disse)
-                    
-                    Note: 
-                    A entrega de hoje é o bug de amanhã. Quando causamos um débito, geramos um legado pro futuro, estamos colocando na conta do futuro a decisão apressada do agora. Nada novo até aqui...e vou parar com citações
-				</section>
-				<section>
-                    <section data-markdown># Um exemplo nada real</section>
-                    <section data-markdown>
-                        Uma empresa nada real pediu para construir um sistema nada plausível para cadastro de produtos para seu cenário completamente diferente de tudo que existe no resto do mundo. Ou pelo menos foi isso que alguém se convenceu a acreditar.
-                    </section>
-                    <section data-markdown>
-                        O sistema precisava ficar pronto bem rápido, então alguns débitos foram gerados. Atrasou alguns meses a entrega no fim das contas, mas foi uma "vitória".
-                    </section>
-                    <section data-markdown>
-                        Então agora o sistema está rodando em produção, tudo está tranquilo, mas vai ser necessária uma alteração...zinha
-                    </section>
-				</section>
-				<section data-markdown>
-                    # Requisito:
-                    Adicionar um cálculo no código para adicionar 0.20% ao preço informado antes de gravar no banco
-                    Note:
-                    Aqui eu mostro como funciona o glorioso sistema, e como tá o código hoje: mostrar a classe main, a classe ProdutoView o o Controller
-				</section>
-				<section>
-                    <h1>Como funciona a aplicação hoje?</h1>
-                    <a href="chrome-extension://pnhechapfaindjhompbnflcldabbghjo/html/nassh.html#profile-id:b0d8" target="_blank">assim!</a>
-				</section>
-				<section>
-                    <section data-markdown>
-                    # Passo a passo
-                    
-                    > Fortemente baseado na bibliografia de Feathers
+<section data-markdown>
+# Ansible: infra as code
+</section data-markdown>
+<section data-markdown>
 
-                    Note:
-                    A inclusão ou não de dependências é um ponto importante. Com Spock + uso de interfaces fica apenas o spock, sem "escolha" de frameworks adicionais. Note como é bom entender o código com caracterização. Ainda que eu encontre um possível problema de design (DAO com todas as regras de negócio), eu pelo menos consegui escrever um monte de testes para uma parte do código
-                    </section>
+## Agenda
 
-                    <section data-markdown>preparar um [script de build](file:///home/mauricio/work/tdc2015/java/legacy-code/build.gradle) que não altere o build do projeto atual</section>
+* O que é o Ansible?
+* Arquitetura e conceitos do Ansible
+* Um exemplo
+</section data-markdown>
+<section data-markdown>
 
-                    <section data-markdown>escrever um teste que instancie a classe onde você (acha que) deve alterar</section>
-                    <section data-markdown>CUIDADO: se precisar fazer alterações mínimas, não intrusivas e preferencialmente daquelas que podem ser feitas automaticamente pela IDE, faça. Com calma...</section>
-                    <section data-markdown>escrever testes que caracterizem o local que eu devo alterar</section>
-                    <section data-markdown>whaaat! Caracterizei parte de um lugar que não serviu para o problema em questão</section>
+## O que é o Ansible?
 
-				</section>
-			</div>
+Ansible is a radically simple IT automation engine that automates cloud provisioning, configuration management, application deployment, intra-service orchestration, and many other IT needs.
+</section data-markdown>
+<section data-markdown>
+
+* é uma ferramenta de provisionamento
+* é um executor de comandos remotos ad hoc
+</section data-markdown>
+<section data-markdown>
+    comandos ad hoc: comandos que não necessariamente serão repetidos, com propósito único
+</section data-markdown>
+<section data-markdown>
+
+
+## Arquitetura e conceitos do Ansible
+</section data-markdown>
+<section data-markdown>
+
+### Python, SSH: seus amigos de todas as horas
+</section data-markdown>
+<section data-markdown>
+#### Agentless
+Não precisa instalar uma ferramenta no servidor, como por exemplo o puppet ou o chef
+</section data-markdown>
+<section data-markdown>
+#### python? você quis dizer praticamente toda distribuição *nix tem isso instalado?
+python é bastante comum, então isso reduz a necessidade de configuração das máquinas
+</section data-markdown>
+<section data-markdown>
+### Inventory
+
+* simples arquivo de texto contendo suas máquinas
+* plugins para Amazon EC2 e outras ferramentas de cloud computing
+
+</section data-markdown>
+<section data-markdown>
+Inventory: um exemplo:
+```
+[webservers]
+www1.example.com
+www2.example.com
+
+[dbservers]
+db0.example.com
+db1.example.com
+```
+</section data-markdown>
+<section data-markdown>
+
+### Ad hoc commander
+
+```
+ansible all -m ping
+ansible foo.example.com -m yum "name=httpd state=installed"
+```
+</section data-markdown>
+<section data-markdown>
+
+### Ansible Playbook!
+
+* YAML
+* roles
+</section data-markdown>
+<section data-markdown>
+
+```
+---
+- hosts: webservers
+serial: 5 # update 5 machines at a time
+roles:
+- common 
+- webapp
+
+- hosts: content_servers
+roles:
+- common
+- content
+```
+</section data-markdown>
+<section data-markdown>
+
+### Um exemplo
+https://github.com/mauricioborges/personal.cm.git
+</section data-markdown>
+</div>
 
 		</div>
 
